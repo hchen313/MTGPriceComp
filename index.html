@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html>
     <head>
         <title> MTG Price Comparer </title>
@@ -11,23 +12,25 @@
     <body>
         <h1 id="title"> MTG Price Comparer </h1>
         <hr> 
-
+        
         <!-- Search Bar-->
         <div id="search">
-            <form>
+            <form autocomplete="off">
                 <label for="cname"> Card Name: </label>
-                <input type="text" id="cname" name="cname" placeholder="Force of Will" required>
+                <input type="text" id="cname" OnKeyUp= "suggest(this.value)" name="cname" placeholder="Force of Will" required>
                 <button type= "button" id="search-button"> <i class="fa-solid fa-magnifying-glass"></i> </button>
+                <hr>
+                <div id="auto"></div>
             </form>
         </div>
-
+    
         <!-- Pop ups when search button is clicked. -->
         <div id="search-results">
-
+            
         <!-- table for comparison -->
         </div>
         <div id="table-for-comp">
-
+    
             <table id="comp-table">
                 <thead>
                     <tr bgcolor="gray" class="table-items">
@@ -46,10 +49,11 @@
                         <td><button id="p2-reset">Reset</button></td>
                     </tr>
                 </tfoot>
-
+                
             </table>
         </div>
-
+    
         <script src="index.js"> </script>
     </body>
+    
 </html>
