@@ -14,6 +14,34 @@ searchButton.onclick = function() {
     document.getElementById("cname").value= "";
 };
 
+function fill(value) {
+    document.getElementById("cname").value= value;
+    searchButton.click();
+    auto= document.getElementById("auto");
+    auto.innerHTML= "";
+}
+
+function suggest(value) {
+    if (String(value).length >= 2) {
+        auto= document.getElementById("auto");
+        auto.innerHTML= "";
+        let list= "";
+        fetch("https://api.scryfall.com/cards/autocomplete?q=" + value)
+        .then(response => response.json())
+        .then(json => {
+            for (let i= 0; i < 5; i++) {
+                if (json.data[i] != undefined) {
+                    list += "<li onclick=\"fill(this.innerHTML)\">" + json.data[i] + "</li>";
+                }
+            }
+
+            auto.innerHTML= "<ul>" + list + "</ul>";
+        })
+    } else if (String(value).length == 0) {
+        auto= document.getElementById("auto");
+        auto.innerHTML= "";
+    }
+}
 
 document.getElementById("p1-reset").onclick = function() {
     let length= p1ITEMs.length;
