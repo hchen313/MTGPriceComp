@@ -5,6 +5,7 @@ var p1Rows= 0;
 var p2Rows= 0; 
 var p1ITEMs= [];
 var p2ITEMs= [];
+var exist= false; 
 
 // When Search is clicked 
 searchButton.onclick = function() {
@@ -17,13 +18,22 @@ searchButton.onclick = function() {
 function fill(value) {
     document.getElementById("cname").value= value;
     searchButton.click();
-    auto= document.getElementById("auto");
-    auto.innerHTML= "";
+    document.getElementById("auto").remove();
+    exist= false;
 }
 
 function suggest(value) {
     if (String(value).length >= 2) {
-        auto= document.getElementById("auto");
+        let auto;
+        if (!exist) {
+            let form= document.getElementById("form");
+            auto= document.createElement("div");
+            auto.setAttribute("id", "auto");
+            form.appendChild(auto);
+            exist= true;
+        } else {
+            auto= document.getElementById("auto");
+        }
         auto.innerHTML= "";
         let list= "";
         fetch("https://api.scryfall.com/cards/autocomplete?q=" + value)
@@ -38,8 +48,10 @@ function suggest(value) {
             auto.innerHTML= "<ul>" + list + "</ul>";
         })
     } else if (String(value).length == 0) {
-        auto= document.getElementById("auto");
-        auto.innerHTML= "";
+        if (exist) {
+            document.getElementById("auto").remove();
+            exist= false;
+        }
     }
 }
 
@@ -85,21 +97,39 @@ function lookUp (cName) {
         let index= 0; 
         try {
             json.data.forEach(element => {
-                document.getElementById("search-results").innerHTML +=
-                "<figure id= \"image"+ index +"\" class= \"IMGfigs\" name=\"" + element.name + ";" + element.set + "\">" + 
-                "<img style=\"transform: translateX(6px)\" src=\"" + element.image_uris.small+ "\">" + 
-                "<table align= \"center\" style=\"border:solid 1px; background-color: black;\">" +
-                "<tr align= \"center\"> <th bgcolor=\"gray\" width=\"70px\"> SET </th> <td bgcolor=\"lightgray\" width=\"70px\">" + element.set + "</td></tr>" + 
-                "<tr align= \"center\"> <th bgcolor=\"gray\" width=\"70px\"> NORMAL </th> <td bgcolor=\"lightgray\" width=\"70px\">" + element.prices.usd + "</td></tr>" + 
-                "<tr align= \"center\"> <th bgcolor=\"gray\" width=\"70px\"> FOIL </th> <td bgcolor=\"lightgray\" width=\"70px\">" + element.prices.usd_foil + "</td></tr>" + 
-                "<tr align= \"center\"> <th bgcolor=\"gray\" width=\"70px\"> ETCHED</th> <td bgcolor=\"lightgray\" width=\"70px\">" + element.prices.usd_etched + "</td></tr>" + 
-                "</table>"+
-                "<select id= \"selectS\">" + options(element.prices.usd, element.prices.usd_foil, element.usd_etched) +"</select>" +
-                "<select id= \"selectP\"> <option>PERSON 1</option> <option> PERSON 2 </option></select>" +
-                "<button class=\"addButton\" data-id= \""+ index++ +"\">ADD</button>"
-                "</figure>";
+                if (element.card_faces != null && element.card_faces[0].image_uris != null) {
+                    document.getElementById("search-results").innerHTML +=
+                    "<figure id= \"image"+ index +"\" class= \"IMGfigs\" name=\"" + element.name + ";" + element.set + "\">" + 
+                    "<img style=\"transform: translateX(6px)\" src=\"" + element.card_faces[0].image_uris.small + "\">" + 
+                    "<table align= \"center\" style=\"border:solid 1px; background-color: black;\">" +
+                    "<tr align= \"center\"> <th bgcolor=\"gray\" width=\"70px\"> SET </th> <td bgcolor=\"lightgray\" width=\"70px\">" + element.set + "</td></tr>" + 
+                    "<tr align= \"center\"> <th bgcolor=\"gray\" width=\"70px\"> NORMAL </th> <td bgcolor=\"lightgray\" width=\"70px\">" + element.prices.usd + "</td></tr>" + 
+                    "<tr align= \"center\"> <th bgcolor=\"gray\" width=\"70px\"> FOIL </th> <td bgcolor=\"lightgray\" width=\"70px\">" + element.prices.usd_foil + "</td></tr>" + 
+                    "<tr align= \"center\"> <th bgcolor=\"gray\" width=\"70px\"> ETCHED</th> <td bgcolor=\"lightgray\" width=\"70px\">" + element.prices.usd_etched + "</td></tr>" + 
+                    "</table>"+
+                    "<select id= \"selectS\">" + options(element.prices.usd, element.prices.usd_foil, element.usd_etched) +"</select>" +
+                    "<select id= \"selectP\"> <option>PERSON 1</option> <option> PERSON 2 </option></select>" +
+                    "<button class=\"addButton\" data-id= \""+ index++ +"\">ADD</button>"
+                    "</figure>";
+                } else {
+                    document.getElementById("search-results").innerHTML +=
+                    "<figure id= \"image"+ index +"\" class= \"IMGfigs\" name=\"" + element.name + ";" + element.set + "\">" + 
+                    "<img style=\"transform: translateX(6px)\" src=\"" + element.image_uris.small+ "\">" + 
+                    "<table align= \"center\" style=\"border:solid 1px; background-color: black;\">" +
+                    "<tr align= \"center\"> <th bgcolor=\"gray\" width=\"70px\"> SET </th> <td bgcolor=\"lightgray\" width=\"70px\">" + element.set + "</td></tr>" + 
+                    "<tr align= \"center\"> <th bgcolor=\"gray\" width=\"70px\"> NORMAL </th> <td bgcolor=\"lightgray\" width=\"70px\">" + element.prices.usd + "</td></tr>" + 
+                    "<tr align= \"center\"> <th bgcolor=\"gray\" width=\"70px\"> FOIL </th> <td bgcolor=\"lightgray\" width=\"70px\">" + element.prices.usd_foil + "</td></tr>" + 
+                    "<tr align= \"center\"> <th bgcolor=\"gray\" width=\"70px\"> ETCHED</th> <td bgcolor=\"lightgray\" width=\"70px\">" + element.prices.usd_etched + "</td></tr>" + 
+                    "</table>"+
+                    "<select id= \"selectS\">" + options(element.prices.usd, element.prices.usd_foil, element.usd_etched) +"</select>" +
+                    "<select id= \"selectP\"> <option>PERSON 1</option> <option> PERSON 2 </option></select>" +
+                    "<button class=\"addButton\" data-id= \""+ index++ +"\">ADD</button>"
+                    "</figure>";
+                }
             });
-        } catch(error) {};
+        } catch(error) {
+            console.log(index);
+        };
 
         let buttons= document.getElementsByClassName("addButton");
 
